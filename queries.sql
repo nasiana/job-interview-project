@@ -11,6 +11,8 @@
    FROM "Lloyds_data";
 
 -- Date normalized view 
+-- I created a view where I was able to extract month_number, month_name and year from the Date column therefore demonstrating that 
+-- these are redundant columns 
 
  SELECT "Lloyds_data"."Date",
     date_part('month'::text, "Lloyds_data"."Date") AS month_number,
@@ -20,21 +22,18 @@
   ORDER BY "Lloyds_data"."Year", (date_part('month'::text, "Lloyds_data"."Date"));
 
 -- Date normalized validated view 
+-- I validated that these columns where redundant as I checked the data against data available in the original table which shows that
+-- the data is identical and therefore is redundant 
 
  SELECT count(*) AS count
    FROM date_normalized d
      JOIN "Lloyds_data" ld ON d."Date" = ld."Date"
   WHERE d."Date" <> ld."Date" AND d.month_number <> ld."Month Number"::double precision AND d.month_name <> ld."Month Name" AND d.year <> ld."Year"::double precision;
 
--- Discount view
-
- SELECT "Lloyds_data"."Product",
-    avg("Lloyds_data"."Discounts" / "Lloyds_data"."Gross Sales")::numeric(10,5) * 100::numeric AS averagediscountpercentage
-   FROM "Lloyds_data"
-  WHERE "Lloyds_data"."Discount Band" <> 'None'::text
-  GROUP BY "Lloyds_data"."Product";
 
  -- Discount band view
+-- I created a view which creates a table with the Discount Band and then the minimum and maximum values for each band, effectively
+-- demonstrating the range of values 
 
   WITH cte1 AS (
          SELECT "Lloyds_data"."Discount Band",
@@ -74,6 +73,10 @@ UNION ALL
    FROM cte3;
 
 -- No natural primary key view
+-- I did a query with multiple columns from the table where the combination of these values should form a primary key
+-- However this combination did not result in a primary key, therefore there is no natural primary key so must use a surrogate key
+-- Would have to investigsate this - there's an issue with the data if there is no natural primary key, is there some column missing or
+-- which has not been provided where we would have been able to infer a primary key based off that?
 
  SELECT DISTINCT "Lloyds_data"."Segment",
     "Lloyds_data"."Country",
@@ -82,6 +85,8 @@ UNION ALL
    FROM "Lloyds_data";
 
 -- Product view 
+-- Normalizing the table - this is a Product table that could have been formed
+-- Product would be the primary key of this table 
 
  SELECT DISTINCT "Lloyds_data"."Product",
     "Lloyds_data"."Manufacturing Price"
@@ -110,6 +115,15 @@ WITH cte AS (
     cte.profit
    FROM cte
   WHERE cte.gross_sales <> 0::double precision OR 0.0000000001::double precision < cte.sales AND cte.sales <> 0::double precision OR cte.profit <> 0::double precision AND 0.0000000001::double precision < cte.profit;
+
+-- Discount view
+
+ SELECT "Lloyds_data"."Product",
+    avg("Lloyds_data"."Discounts" / "Lloyds_data"."Gross Sales")::numeric(10,5) * 100::numeric AS averagediscountpercentage
+   FROM "Lloyds_data"
+  WHERE "Lloyds_data"."Discount Band" <> 'None'::text
+  GROUP BY "Lloyds_data"."Product";
+
 
 -- Summary country view
 
