@@ -1,4 +1,4 @@
-In this project, our objective was to analyse a raw data set using Python for data interpretation and organization. The provided file was in Excel format. 
+In this project, my objective was to analyse a raw data set using Python for data interpretation and organization. The provided file was in Excel format. 
 
 Here's an overview of the approach I followed for data analysis: 
 
